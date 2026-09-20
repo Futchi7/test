@@ -1,0 +1,395 @@
+:root {
+  --bg: #fdf6ec;
+  --surface: #ffffff;
+  --text: #3a2b1f;
+  --text-muted: #7a6a58;
+  --border: #e6d9c3;
+  --accent: #b5651d;
+  --accent-dark: #8a4b2e;
+  --leaf: #4f8a3f;
+  --status-growing: #6b7280;
+  --status-approaching: #c47f00;
+  --status-ready: #2f9e44;
+  --status-overdue: #c0392b;
+
+  font: 16px/1.6 system-ui, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #201a14;
+    --surface: #2b241c;
+    --text: #f2e8db;
+    --text-muted: #b8a891;
+    --border: #4a3d2c;
+    --accent: #e0975a;
+    --accent-dark: #d9843a;
+    --leaf: #7cc26a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 100svh;
+  padding: 0 16px 48px;
+}
+
+.screen {
+  padding-top: 16px;
+  position: relative;
+}
+
+.screen-header h1 {
+  font-size: 24px;
+  margin: 4px 0 2px;
+  color: var(--text);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card h2 {
+  font-size: 17px;
+  margin: 0 0 10px;
+}
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.card-header-row h2 {
+  margin: 0;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #fff;
+}
+.badge-growing {
+  background: var(--status-growing);
+}
+.badge-approaching {
+  background: var(--status-approaching);
+}
+.badge-ready {
+  background: var(--status-ready);
+}
+.badge-overdue {
+  background: var(--status-overdue);
+}
+
+.progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.progress-growing {
+  background: var(--status-growing);
+}
+.progress-approaching {
+  background: var(--status-approaching);
+}
+.progress-ready {
+  background: var(--status-ready);
+}
+.progress-overdue {
+  background: var(--status-overdue);
+}
+.progress-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 6px 0 12px;
+}
+
+.stat-list {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.stat-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 6px;
+}
+.stat-list dt {
+  color: var(--text-muted);
+}
+.stat-list dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 8px 0;
+}
+.hint-warn {
+  color: var(--status-overdue);
+}
+
+.callout {
+  background: rgba(181, 101, 29, 0.12);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+.disclaimer {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 16px;
+}
+
+.planting-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.planting-row {
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.planting-row-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.planting-row-plot {
+  font-weight: 700;
+  font-size: 16px;
+}
+.planting-row-variety {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.planting-row-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.fab {
+  position: sticky;
+  bottom: 16px;
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+.form-compact {
+  gap: 10px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+.field > span {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+textarea {
+  resize: vertical;
+}
+
+.primary-button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.primary-button:disabled {
+  opacity: 0.6;
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--accent-dark);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.secondary-button:disabled {
+  opacity: 0.5;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: left;
+}
+.link-button-danger {
+  color: var(--status-overdue);
+}
+
+.log-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.log-item {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+.log-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.log-date {
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+}
+.log-kind-tag {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+}
+.log-kind-sensor {
+  background: var(--leaf);
+}
+.log-kind-harvest {
+  background: var(--accent-dark);
+}
+.log-photo {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 6px 0;
+  display: block;
+}
+.log-size,
+.log-sensor,
+.log-memo {
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+.sensor-reading {
+  background: rgba(79, 138, 63, 0.1);
+  border: 1px solid var(--leaf);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
