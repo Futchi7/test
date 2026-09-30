@@ -1,0 +1,791 @@
+<title>禁煙わんこ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: one phone-width column; the dog's scene is the hero, numbers below, fixed bottom tab bar + SOS button. */
+:root{
+  --bg:#EAF2EF;        /* 澄んだ空気のミント */
+  --surface:#FFFFFF;
+  --soft:#DDEBE6;
+  --ink:#16302C;
+  --muted:#58706B;
+  --line:#CFE0DA;
+  --accent:#E07F22;    /* 子犬の毛色に寄せたアンバー */
+  --accent-soft:#FBE7D3;
+  --teal:#2A8A79;
+  --sos:#D8453A;
+  --sos-soft:#FBE1DE;
+  --f-display:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1A18;--surface:#172624;--soft:#1E322F;--ink:#E4EFEC;--muted:#98B0AB;--line:#28403C;
+  --accent:#F29A48;--accent-soft:#3A2A1A;--teal:#5CC4B1;--sos:#F06A5C;--sos-soft:#3B1E1B;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1A18;--surface:#172624;--soft:#1E322F;--ink:#E4EFEC;--muted:#98B0AB;--line:#28403C;
+  --accent:#F29A48;--accent-soft:#3A2A1A;--teal:#5CC4B1;--sos:#F06A5C;--sos-soft:#3B1E1B;color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;padding-inline:16px;padding-block:0 calc(150px + env(safe-area-inset-bottom,0px))}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.3}
+.num{font-family:var(--f-display);font-variant-numeric:tabular-nums}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.view{display:flex;flex-direction:column;gap:14px;width:100%}
+
+.top{display:flex;align-items:center;justify-content:space-between;padding-top:14px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.brand svg{width:26px;height:26px}
+.top .date{font-size:12px;color:var(--muted)}
+
+.banner{background:var(--accent-soft);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:13px}
+.banner b{font-family:var(--f-display)}
+
+.card{background:var(--surface);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--muted);font-weight:700}
+
+/* scene */
+.scene-card{background:var(--surface);border-radius:24px;overflow:hidden}
+.scene{position:relative;aspect-ratio:1/1;max-width:100%;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.scene svg{display:block;width:100%;height:100%}
+.scene.tappable{cursor:pointer}
+.scene-meta{padding:12px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.scene-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.scene-row h2{font-size:22px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-family:var(--f-display)}
+.love{font-family:var(--f-display);color:var(--sos);font-weight:700;font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .6s}
+.bar.teal>i{background:var(--teal)}
+.hint{font-size:12.5px;color:var(--muted)}
+
+/* timer */
+.timer-card{text-align:center;padding:18px 16px}
+.timer{font-family:var(--f-display);font-variant-numeric:tabular-nums;font-weight:800;line-height:1.1;display:flex;justify-content:center;align-items:baseline;gap:8px;flex-wrap:wrap}
+.timer .d{font-size:56px;color:var(--accent)}
+.timer .u{font-size:18px}
+.timer .hms{font-size:26px;color:var(--ink)}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--surface);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat .v{font-family:var(--f-display);font-weight:800;font-size:23px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stat .v small{font-size:13px;font-weight:700;margin-left:2px}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .s{font-size:11.5px;color:var(--muted)}
+
+.row{display:flex;gap:12px;align-items:center}
+.row>.grow{flex:1;min-width:0}
+.thumb{width:64px;height:64px;border-radius:14px;overflow:hidden;flex:none;background:var(--soft)}
+.thumb svg{width:100%;height:100%;display:block}
+.thumb.locked svg{filter:grayscale(1) blur(1.5px);opacity:.45}
+
+/* buttons */
+.btn{border:0;border-radius:14px;padding:12px 16px;font-weight:700;font-family:var(--f-display);background:var(--soft);color:var(--ink)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.teal{background:var(--teal);color:#fff}
+.btn.danger{background:var(--sos-soft);color:var(--sos)}
+.btn.small{padding:7px 12px;font-size:13px;border-radius:10px}
+.btn.block{width:100%}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1 1 140px}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;z-index:20}
+.nav-in{display:grid;grid-template-columns:repeat(5,1fr);max-width:520px;width:100%}
+.nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);padding:6px 0;font-weight:700;position:relative}
+.nav button svg{width:24px;height:24px}
+.nav button[aria-current="page"]{color:var(--accent)}
+.nav .dot{position:absolute;top:4px;right:calc(50% - 18px);width:8px;height:8px;border-radius:50%;background:var(--sos)}
+.sos-fab{position:fixed;right:max(16px,calc(50% - 244px));bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:21;border:0;border-radius:99px;background:var(--sos);color:#fff;font-family:var(--f-display);font-weight:800;font-size:15px;padding:13px 20px;box-shadow:0 8px 22px rgba(200,50,40,.35);display:flex;align-items:center;gap:8px}
+.sos-fab svg{width:20px;height:20px}
+
+/* lists */
+.list{display:flex;flex-direction:column}
+.list>li{list-style:none;padding:12px 0;border-top:1px solid var(--line)}
+.list>li:first-child{border-top:0}
+ul.list{margin:0;padding:0}
+.tag{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em}
+.got{color:var(--teal);font-weight:700;font-size:12.5px;font-family:var(--f-display)}
+.left{color:var(--muted);font-size:12.5px}
+
+.stages{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stage{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-size:11.5px;min-width:0}
+.stage .thumb{width:100%;height:auto;aspect-ratio:1/1}
+.stage.future .thumb svg{filter:brightness(0);opacity:.13}
+.stage.now .thumb{outline:3px solid var(--accent)}
+.stage b{font-family:var(--f-display);font-size:12px}
+
+/* wardrobe */
+.slot h3{font-size:15px}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.chip{border:2px solid transparent;background:var(--soft);border-radius:14px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;font-weight:700;min-width:0;text-align:center;line-height:1.3}
+.chip .thumb{width:100%;height:auto;aspect-ratio:1/1;background:var(--surface)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.chip:disabled{cursor:not-allowed;color:var(--muted)}
+.chip .none{display:grid;place-items:center;color:var(--muted);font-size:22px}
+
+/* health */
+.hl{display:flex;gap:12px}
+.hl .mark{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:var(--soft);color:var(--muted);font-family:var(--f-display)}
+.hl.done .mark{background:var(--teal);color:#fff}
+.hl.cur .mark{background:var(--accent);color:#fff}
+.hl .t{font-family:var(--f-display);font-weight:700;font-size:13px;color:var(--muted)}
+.hl.done .t{color:var(--teal)}
+
+/* form */
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12.5px;font-weight:700;color:var(--muted)}
+.field input,.field textarea{background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+.field textarea{min-height:96px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:380px){.grid2{grid-template-columns:1fr}}
+
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(10,25,22,.5);display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.modal{background:var(--surface);border-radius:24px;padding:20px;width:100%;max-width:480px;max-height:88vh;overflow:auto;display:flex;flex-direction:column;gap:12px;animation:up .3s ease-out}
+.modal h2{font-size:21px}
+.modal>*{flex:none}
+@keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+
+.sos{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.sos-in{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.sos-head{display:flex;justify-content:space-between;align-items:center}
+.sos-head h2{font-size:20px;color:var(--sos)}
+.card.urge{flex-direction:row;gap:14px;align-items:center}
+.urge .ring{width:92px;height:92px;flex:none;position:relative}
+.urge .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.urge .ring span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.seg{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.seg button{flex:none;border:0;border-radius:99px;padding:8px 14px;background:var(--surface);font-weight:700;font-size:13px;font-family:var(--f-display)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.pane{min-height:320px}
+
+.breath{display:flex;flex-direction:column;align-items:center;gap:14px;padding:16px 0}
+.bwrap{width:220px;height:220px;max-width:100%;display:grid;place-items:center;position:relative}
+.bcircle{width:220px;height:220px;max-width:100%;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--accent-soft),var(--teal));transform:scale(.5);transition-property:transform;transition-timing-function:ease-in-out}
+.bwrap b{position:absolute;font-family:var(--f-display);font-size:34px;color:#fff;font-variant-numeric:tabular-nums}
+.btext{font-family:var(--f-display);font-weight:700;font-size:20px}
+
+.field-game{position:relative;height:300px;background:linear-gradient(var(--soft),var(--surface));border-radius:20px;overflow:hidden;touch-action:manipulation}
+.ball{position:absolute;width:54px;height:54px;border-radius:50%;border:0;padding:0;background:radial-gradient(circle at 35% 30%,#F4FF9C,#C8DC2C 60%,#9FB31A);box-shadow:0 4px 10px rgba(0,0,0,.18);animation:pop .25s ease-out}
+.ball::after{content:"";position:absolute;inset:6px;border-radius:50%;border:3px solid rgba(255,255,255,.85);border-left-color:transparent;border-right-color:transparent;transform:rotate(30deg)}
+.ball.caught{animation:catch .25s forwards}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+@keyframes catch{to{transform:scale(1.6);opacity:0}}
+.game-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center}
+.hud{display:flex;justify-content:space-between;font-family:var(--f-display);font-weight:700}
+
+.idea{font-family:var(--f-display);font-size:21px;font-weight:700;line-height:1.45;min-height:3em}
+.reasons{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;font-size:16px}
+
+.heart{position:absolute;pointer-events:none;color:var(--sos);font-size:26px;animation:float 1s ease-out forwards;transform:translate(-50%,-50%)}
+@keyframes float{to{transform:translate(-50%,-160%) scale(1.4);opacity:0}}
+
+.toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;font-size:14px;z-index:60;max-width:calc(100% - 32px);text-align:center;transition:opacity .3s}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:70;width:100%;height:100%}
+
+.confirm{background:var(--sos-soft);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13.5px}
+.note{font-size:12px;color:var(--muted)}
+
+/* dog animation */
+.tail{transform-box:fill-box;transform-origin:0% 100%;animation:wag .5s ease-in-out infinite alternate}
+@keyframes wag{from{transform:rotate(-10deg)}to{transform:rotate(16deg)}}
+.eyes{transform-box:fill-box;transform-origin:center;animation:blink 5s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.dog{transform-box:fill-box;transform-origin:50% 100%}
+.dog.hop{animation:hop .45s ease-out}
+@keyframes hop{40%{transform:translateY(-16px) scale(1.03,.97)}}
+.sleeping{animation:breathe 3.2s ease-in-out infinite}
+.sleeping .tail{animation:none}
+@keyframes breathe{50%{transform:scale(1.02,.975)}}
+.zz{animation:zz 2.6s ease-in-out infinite}
+@keyframes zz{50%{transform:translateY(-6px);opacity:.5}}
+.petal{animation:petal 6s linear infinite}
+@keyframes petal{from{transform:translate(0,-40px) rotate(0)}to{transform:translate(-60px,320px) rotate(360deg)}}
+.twinkle{animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="17" r="11" fill="#E7AE6A"/><ellipse cx="6.5" cy="15" rx="4" ry="7" transform="rotate(20 6.5 15)" fill="#C98A45"/><ellipse cx="25.5" cy="15" rx="4" ry="7" transform="rotate(-20 25.5 15)" fill="#C98A45"/><ellipse cx="16" cy="21" rx="6" ry="4.5" fill="#FFF3E0"/><circle cx="12" cy="15.5" r="1.6" fill="#3A2A20"/><circle cx="20" cy="15.5" r="1.6" fill="#3A2A20"/><ellipse cx="16" cy="19" rx="2" ry="1.4" fill="#3A2A20"/></svg>
+      禁煙わんこ
+    </div>
+    <div class="date" id="today"></div>
+  </header>
+  <div id="banner"></div>
+  <main id="view" class="view"></main>
+</div>
+
+<button class="sos-fab" id="sosFab" data-act="sos" aria-label="吸いたくなったときのSOS">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z"/></svg>
+  吸いたい！
+</button>
+
+<nav class="nav" aria-label="メニュー"><div class="nav-in" id="nav"></div></nav>
+<div id="sos" class="sos" hidden></div>
+<div id="overlay" class="overlay" hidden></div>
+<div id="toast" class="toast" hidden></div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+(function(){
+'use strict';
+const DAY=86400000, HOUR=3600000, MIN=60000;
+const KEY='kinen-wanko-v1';
+const MIN_PER_CIG=20; // 1本あたり失う寿命（UCL 2024年研究の推計 約20分）
+
+/* ---------- data ---------- */
+const SLOTS={bg:'背景',clothes:'おようふく',head:'あたま',face:'かお',neck:'くび'};
+const ITEMS=[
+  {id:'bg_room',slot:'bg',name:'おへや',days:0},
+  {id:'neck_bandana',slot:'neck',name:'赤いバンダナ',days:1},
+  {id:'head_ribbon',slot:'head',name:'きいろのリボン',days:3},
+  {id:'bg_park',slot:'bg',name:'ひだまり公園',days:5},
+  {id:'cl_border',slot:'clothes',name:'ボーダーTシャツ',days:7},
+  {id:'face_sun',slot:'face',name:'サングラス',days:10},
+  {id:'bg_beach',slot:'bg',name:'夏の海辺',days:14},
+  {id:'neck_bow',slot:'neck',name:'蝶ネクタイ',days:21},
+  {id:'cl_knit',slot:'clothes',name:'ニットセーター',days:30},
+  {id:'head_beret',slot:'head',name:'ベレー帽',days:45},
+  {id:'bg_sakura',slot:'bg',name:'桜並木',days:60},
+  {id:'cl_rain',slot:'clothes',name:'レインコート',days:90},
+  {id:'head_flower',slot:'head',name:'花かんむり',days:120},
+  {id:'face_round',slot:'face',name:'まるメガネ',days:150},
+  {id:'bg_night',slot:'bg',name:'星空の丘',days:180},
+  {id:'neck_scarf',slot:'neck',name:'チェックのマフラー',days:240},
+  {id:'cl_hoodie',slot:'clothes',name:'パーカー',days:300},
+  {id:'head_crown',slot:'head',name:'王冠',days:365},
+  {id:'bg_space',slot:'bg',name:'宇宙旅行',days:500},
+  {id:'cl_cape',slot:'clothes',name:'ヒーローマント',days:730},
+  {id:'bg_rainbow',slot:'bg',name:'虹の丘',days:1000},
+];
+const ITEM=Object.fromEntries(ITEMS.map(i=>[i.id,i]));
+const REWARDS=ITEMS.filter(i=>i.days>0);
+
+const STAGES=[
+  {d:0,name:'生まれたて',s:.55,hs:1.38,sleep:true,msg:'すやすや眠っています。最初の24時間を見守ってあげて。'},
+  {d:1,name:'よちよち',s:.62,hs:1.32,msg:'目をあけました。あなたのことをじっと見ています。'},
+  {d:3,name:'子犬',s:.70,hs:1.25,msg:'ニコチンが体から抜けるころ。いちばんの山場を一緒に越えよう。'},
+  {d:7,name:'やんちゃ盛り',s:.78,hs:1.18,msg:'1週間！ しっぽが止まりません。'},
+  {d:30,name:'若犬',s:.88,hs:1.10,msg:'1か月。習慣が変わり始めています。'},
+  {d:90,name:'成犬',s:.96,hs:1.03,msg:'3か月。すっかり頼もしくなりました。'},
+  {d:180,name:'頼れる相棒',s:1.02,hs:1.00,msg:'半年。もう立派な相棒です。'},
+  {d:365,name:'最高の親友',s:1.08,hs:1.00,glow:true,msg:'1年。あなたとこの子の記念日です。'},
+];
+
+const HEALTH=[
+  {ms:20*MIN,t:'20分',title:'血圧と脈拍が正常に近づく'},
+  {ms:8*HOUR,t:'8時間',title:'血中の一酸化炭素が減り、酸素が体に行き渡る'},
+  {ms:DAY,t:'24時間',title:'心臓発作のリスクが下がり始める'},
+  {ms:2*DAY,t:'48時間',title:'においと味がわかりやすくなる'},
+  {ms:3*DAY,t:'72時間',title:'気管支がゆるみ、呼吸が楽になる'},
+  {ms:14*DAY,t:'2週間',title:'血液の流れと肺の機能が良くなり始める'},
+  {ms:90*DAY,t:'3か月',title:'せきや息切れが減ってくる'},
+  {ms:365*DAY,t:'1年',title:'心臓病のリスクが喫煙者の約半分に'},
+  {ms:5*365*DAY,t:'5年',title:'脳卒中のリスクが非喫煙者に近づく'},
+  {ms:10*365*DAY,t:'10年',title:'肺がんで亡くなるリスクが喫煙者の約半分に'},
+  {ms:15*365*DAY,t:'15年',title:'心臓病のリスクが非喫煙者と同じ水準に'},
+];
+
+const IDEAS=[
+  '冷たい水をコップ1杯、ゆっくり飲む',
+  '歯みがきをする。口がさっぱりすると吸いたさが下がります',
+  'その場を離れて、5分だけ歩く',
+  'ガムを噛むか、氷をひとつ口に含む',
+  '手を洗って、ハンドクリームを塗る',
+  '好きな曲を1曲だけ聴く',
+  '誰かに「いま禁煙がんばってる」と送る',
+  '肩をぐるっと10回まわして、背伸びする',
+  '窓を開けて、外の空気を吸う',
+  'スクワットを10回だけやってみる',
+  '浮いたお金で買いたいものを検索する',
+  'シャワーで顔を洗う',
+];
+
+/* ---------- state ---------- */
+function defaults(){
+  const now=Date.now();
+  return {v:1,sample:true,quitAt:now-12*DAY-4.5*HOUR,perDay:20,packPrice:600,perPack:20,
+    dogName:'こむぎ',reasons:['家族と長く元気に過ごしたい','朝の息苦しさから解放されたい','浮いたお金で旅行に行く'],
+    goalName:'週末の温泉旅行',goalPrice:30000,pastMs:0,unlocked:[],
+    equipped:{bg:'bg_park',clothes:'cl_border',head:'head_ribbon',face:null,neck:'neck_bandana'},
+    wins:4,pets:0,slips:[],tab:'home'};
+}
+function load(){try{const s=localStorage.getItem(KEY);if(!s)return null;const o=JSON.parse(s);return o&&o.v===1?Object.assign(defaults(),o):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let S=load()||defaults();
+if(S.sample) S.unlocked=REWARDS.filter(i=>totalMs()>=i.days*DAY).map(i=>i.id);
+
+function streakMs(){return Math.max(0,Date.now()-S.quitAt)}
+function totalMs(){return S.pastMs+streakMs()}
+function totalDays(){return totalMs()/DAY}
+function perCig(){return S.perPack>0?S.packPrice/S.perPack:0}
+function cigsAvoided(){return Math.floor(totalMs()/DAY*S.perDay)}
+function saved(){return Math.floor(cigsAvoided()*perCig())}
+function stageIdx(){const d=totalDays();let i=0;STAGES.forEach((s,k)=>{if(d>=s.d)i=k});return i}
+function isUnlocked(id){return ITEM[id].days===0||S.unlocked.includes(id)}
+
+/* ---------- format ---------- */
+const yen=n=>'¥'+Math.floor(n).toLocaleString('ja-JP');
+const pad=n=>String(n).padStart(2,'0');
+function fmtDur(ms){
+  ms=Math.max(0,ms);
+  const d=Math.floor(ms/DAY),h=Math.floor(ms%DAY/HOUR),m=Math.floor(ms%HOUR/MIN);
+  if(d>=1)return d+'日'+(h?' '+h+'時間':'');
+  if(h>=1)return h+'時間'+(m?' '+m+'分':'');
+  return Math.max(1,m)+'分';
+}
+function fmtDate(t){const d=new Date(t);return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`}
+function toLocalInput(t){const d=new Date(t);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+
+/* ---------- illustration ---------- */
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function stars(n,seed,maxY,color){const r=rng(seed);let o='';for(let i=0;i<n;i++){const x=(r()*300).toFixed(1),y=(r()*maxY).toFixed(1),s=(r()*1.4+.5).toFixed(2);o+=`<circle cx="${x}" cy="${y}" r="${s}" fill="${color}" class="${i%3===0?'twinkle':''}" style="animation-delay:${(r()*2.4).toFixed(2)}s"/>`}return o}
+function sky(p,a,b){return `<defs><linearGradient id="${p}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="300" height="300" fill="url(#${p}sky)"/>`}
+function tree(x,y,c1,c2){return `<rect x="${x-5}" y="${y}" width="10" height="${222-y+4}" fill="#8A6040"/><circle cx="${x}" cy="${y-8}" r="26" fill="${c1}"/><circle cx="${x-16}" cy="${y+6}" r="17" fill="${c2}"/><circle cx="${x+16}" cy="${y+4}" r="17" fill="${c2}"/>`}
+
+function bgSVG(id,p){
+  switch(id){
+  case 'bg_park': return sky(p,'#8FD0F2','#E4F5FB')+
+    `<circle cx="248" cy="56" r="24" fill="#FFD966"/><g fill="#fff" opacity=".92"><ellipse cx="70" cy="62" rx="30" ry="12"/><ellipse cx="92" cy="54" rx="20" ry="12"/><ellipse cx="190" cy="96" rx="24" ry="9"/></g>
+    <ellipse cx="50" cy="240" rx="170" ry="70" fill="#A4D694"/><ellipse cx="280" cy="246" rx="170" ry="64" fill="#8FCB80"/>
+    ${tree(44,150,'#5FAE5A','#6DBB63')}${tree(254,164,'#4E9E50','#5AAA58')}
+    <rect y="222" width="300" height="78" fill="#7DC26F"/>
+    <g fill="#fff">${[[30,250],[90,284],[222,262],[270,290],[180,292]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3"/><circle cx="${x}" cy="${y}" r="1.4" fill="#F7C948"/>`).join('')}</g>`;
+  case 'bg_beach': return sky(p,'#7CC6EF','#D3EEF8')+
+    `<circle cx="70" cy="60" r="26" fill="#FFE07A"/><g fill="#fff" opacity=".9"><ellipse cx="220" cy="54" rx="34" ry="11"/><ellipse cx="240" cy="46" rx="18" ry="10"/></g>
+    <rect y="150" width="300" height="80" fill="#3C9FC8"/><rect y="150" width="300" height="10" fill="#5CB6DA"/>
+    <g stroke="#fff" stroke-width="2.5" fill="none" opacity=".75" stroke-linecap="round"><path d="M20 176q10-6 20 0t20 0"/><path d="M160 186q10-6 20 0t20 0"/><path d="M240 170q10-6 20 0"/><path d="M90 200q10-6 20 0t20 0"/></g>
+    <path d="M0 214 Q75 204 150 212 T300 210 V300 H0Z" fill="#F2D8A2"/><path d="M0 214 Q75 204 150 212 T300 210" stroke="#fff" stroke-width="4" fill="none" opacity=".8"/>
+    <path d="M40 262 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1z" fill="#F08A5D"/><ellipse cx="262" cy="276" rx="9" ry="6" fill="#F7E3EC"/>`;
+  case 'bg_sakura': {
+    const r=rng(11);let petals='';
+    for(let i=0;i<12;i++)petals+=`<ellipse class="petal" cx="${(r()*340).toFixed(0)}" cy="0" rx="4" ry="2.6" fill="#F6A9BF" style="animation-delay:-${(r()*6).toFixed(2)}s;animation-duration:${(5+r()*3).toFixed(1)}s"/>`;
+    const blossom=(x,y)=>`<circle cx="${x}" cy="${y}" r="30" fill="#F7BACB"/><circle cx="${x-22}" cy="${y+14}" r="20" fill="#F9CDD9"/><circle cx="${x+24}" cy="${y+10}" r="22" fill="#F4A7BE"/><circle cx="${x+4}" cy="${y-20}" r="18" fill="#FAD4DF"/>`;
+    return sky(p,'#FDE2EB','#FFF7F9')+
+    `<path d="M34 222 C36 180 30 140 44 110" stroke="#7A5238" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M268 222 C266 176 272 150 258 118" stroke="#7A5238" stroke-width="11" fill="none" stroke-linecap="round"/>
+    ${blossom(46,96)}${blossom(254,104)}${blossom(150,40)}
+    <rect y="222" width="300" height="78" fill="#CDE6B6"/><path d="M0 250 H300" stroke="#F7C7D4" stroke-width="16" opacity=".6"/>
+    <g>${petals}</g>`;}
+  case 'bg_night': return sky(p,'#0C1938','#324C85')+stars(46,5,200,'#FFF6D8')+
+    `<defs><mask id="${p}moon"><rect width="300" height="300" fill="#fff"/><circle cx="252" cy="52" r="20" fill="#000"/></mask></defs>
+    <circle cx="240" cy="60" r="22" fill="#FFF0BA" mask="url(#${p}moon)"/>
+    <ellipse cx="60" cy="236" rx="180" ry="60" fill="#22406A"/><ellipse cx="270" cy="240" rx="160" ry="56" fill="#1D375B"/>
+    <rect y="222" width="300" height="78" fill="#1A3150"/>
+    <g fill="#F9E27D">${[[40,200],[250,190],[210,236],[70,262]].map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="2.4" class="twinkle" style="animation-delay:${i*.6}s"/>`).join('')}</g>`;
+  case 'bg_space': return sky(p,'#0A0620','#2B1759')+stars(60,9,300,'#FFFFFF')+
+    `<g transform="rotate(-18 72 82)"><circle cx="72" cy="82" r="30" fill="#F0A04B"/><path d="M44 74 Q72 66 100 74" stroke="#D67E2C" stroke-width="5" fill="none"/><path d="M46 92 Q72 98 98 90" stroke="#F7C07F" stroke-width="4" fill="none"/><ellipse cx="72" cy="82" rx="52" ry="11" fill="none" stroke="#F7D9A6" stroke-width="4"/></g>
+    <circle cx="238" cy="54" r="11" fill="#7FD1C7"/><circle cx="234" cy="50" r="3" fill="#B6ECE5"/>
+    <ellipse cx="150" cy="306" rx="280" ry="92" fill="#B7B2CB"/><ellipse cx="60" cy="258" rx="20" ry="6" fill="#A29CB8"/><ellipse cx="236" cy="266" rx="26" ry="7" fill="#A29CB8"/><ellipse cx="160" cy="290" rx="16" ry="5" fill="#A29CB8"/>`;
+  case 'bg_rainbow': {
+    const cols=['#F28B82','#F7B267','#F9E27D','#9FD98B','#7CC4F2','#A99BE8'];
+    return sky(p,'#BFE5FF','#F5FBFF')+
+    `<g fill="none" stroke-width="13" opacity=".85">${cols.map((c,i)=>{const r=176-i*13;return `<path d="M${150-r} 230 A${r} ${r} 0 0 1 ${150+r} 230" stroke="${c}"/>`}).join('')}</g>
+    <g fill="#fff"><ellipse cx="30" cy="214" rx="36" ry="16"/><ellipse cx="270" cy="214" rx="36" ry="16"/><ellipse cx="54" cy="206" rx="20" ry="14"/><ellipse cx="248" cy="206" rx="20" ry="14"/></g>
+    <path d="M0 226 Q150 206 300 226 V300 H0Z" fill="#8ED17E"/>
+    <g>${[[40,258],[110,276],[200,262],[262,284]].map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="4" fill="${cols[i]}"/>`).join('')}</g>`;}
+  default: // room
+    return `<rect width="300" height="300" fill="#F4E6D4"/><rect y="150" width="300" height="72" fill="#EBD6BD"/><rect y="148" width="300" height="5" fill="#DCC2A2"/>
+    <rect x="28" y="36" width="92" height="84" rx="6" fill="#BFE3F2" stroke="#FFFFFF" stroke-width="7"/><path d="M74 36 V120 M28 78 H120" stroke="#fff" stroke-width="5"/>
+    <ellipse cx="54" cy="58" rx="14" ry="5" fill="#fff" opacity=".8"/>
+    <rect x="196" y="52" width="66" height="50" rx="4" fill="#FBF6EE" stroke="#C99D6D" stroke-width="5"/><path d="M229 88 c-12-8-14-18-6-21 4-1 6 2 6 4 0-2 2-5 6-4 8 3 6 13-6 21z" fill="#E88A84"/>
+    <rect x="220" y="150" width="46" height="60" rx="6" fill="#9BC7A0"/><rect x="226" y="140" width="34" height="14" rx="4" fill="#D98E5B"/><circle cx="243" cy="128" r="14" fill="#5FA36A"/><circle cx="232" cy="136" r="10" fill="#6DB277"/><circle cx="255" cy="134" r="10" fill="#6DB277"/>
+    <rect y="218" width="300" height="82" fill="#D6AB7B"/><g stroke="#C4966A" stroke-width="2"><path d="M0 240 H300 M0 264 H300 M0 288 H300"/></g>
+    <ellipse cx="150" cy="272" rx="116" ry="22" fill="#E59C7C"/><ellipse cx="150" cy="272" rx="96" ry="15" fill="none" stroke="#F4C1A8" stroke-width="3" stroke-dasharray="6 6"/>`;
+  }
+}
+
+const F='#E7AE6A',FD='#C98A45',CR='#FFF3E0',INK='#3A2A20';
+function clothesSVG(id){
+  switch(id){
+  case 'cl_border':{let o='<rect x="-50" y="-116" width="100" height="74" fill="#FBFBF6"/>';for(let y=-108;y<-46;y+=13)o+=`<rect x="-50" y="${y}" width="100" height="6" fill="#2E4E86"/>`;return o+'<rect x="-50" y="-44" width="100" height="4" fill="#2E4E86"/>';}
+  case 'cl_knit':{let z='';for(const y of [-92,-70]){let d=`M-50 ${y}`;for(let x=-50;x<50;x+=10)d+=` l5 7 l5 -7`;z+=`<path d="${d}" stroke="#F4E7C8" stroke-width="3" fill="none"/>`}
+    return `<rect x="-50" y="-116" width="100" height="82" fill="#3F8C6A"/>${z}<rect x="-50" y="-40" width="100" height="8" fill="#2F7556"/><path d="M-40 -40 v8 M-30 -40 v8 M-20 -40 v8 M-10 -40 v8 M0 -40 v8 M10 -40 v8 M20 -40 v8 M30 -40 v8 M40 -40 v8" stroke="#3F8C6A" stroke-width="2"/>`;}
+  case 'cl_rain': return `<rect x="-50" y="-116" width="100" height="100" fill="#F4C22F"/><path d="M0 -116 V-16" stroke="#D9A514" stroke-width="3"/><g fill="#2F4F6F"><circle cx="-7" cy="-92" r="3.5"/><circle cx="-7" cy="-72" r="3.5"/><circle cx="-7" cy="-52" r="3.5"/></g><rect x="14" y="-62" width="22" height="7" rx="3" fill="#D9A514"/>`;
+  case 'cl_hoodie': return `<rect x="-50" y="-116" width="100" height="86" fill="#8D7FC2"/><path d="M-24 -60 H24 L30 -38 H-30Z" fill="#7B6DB0"/><path d="M-8 -110 V-84 M8 -110 V-84" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="-8" cy="-83" r="3" fill="#fff"/><circle cx="8" cy="-83" r="3" fill="#fff"/><rect x="-50" y="-34" width="100" height="6" fill="#7466A8"/>`;
+  default: return '';
+  }
+}
+function headItemSVG(id){
+  switch(id){
+  case 'head_ribbon': return `<g transform="translate(24 -38) rotate(15)"><path d="M0 0 L-18 -12 L-18 12Z" fill="#F5C542"/><path d="M0 0 L18 -12 L18 12Z" fill="#F5C542"/><circle r="5.5" fill="#E0A91E"/></g>`;
+  case 'head_beret': return `<g transform="rotate(-10 0 -40)"><ellipse cx="4" cy="-37" rx="40" ry="12" fill="#B83A32"/><ellipse cx="4" cy="-43" rx="32" ry="13" fill="#D2544A"/><rect x="2" y="-60" width="4" height="8" rx="2" fill="#8E2B25"/></g>`;
+  case 'head_flower':{const cols=['#F28BA8','#FFFFFF','#F7C948','#B39DDB'];let o='';for(let i=0;i<7;i++){const a=(200+i*23.3)*Math.PI/180,x=(44*Math.cos(a)).toFixed(1),y=(44*Math.sin(a)).toFixed(1);o+=`<ellipse cx="${x}" cy="${y}" rx="9" ry="4" fill="#6DB277" transform="rotate(${200+i*23.3+60} ${x} ${y})"/>`;}
+    for(let i=0;i<7;i++){const a=(200+i*23.3)*Math.PI/180,x=(44*Math.cos(a)).toFixed(1),y=(44*Math.sin(a)).toFixed(1);o+=`<circle cx="${x}" cy="${y}" r="7.5" fill="${cols[i%4]}"/><circle cx="${x}" cy="${y}" r="2.6" fill="#F2A93B"/>`;}return o;}
+  case 'head_crown': return `<g transform="translate(0 -44)"><path d="M-24 4 L-27 -22 L-12 -10 L0 -30 L12 -10 L27 -22 L24 4Z" fill="#F2C230" stroke="#C99A12" stroke-width="2" stroke-linejoin="round"/><circle cx="0" cy="-5" r="4" fill="#E0457B"/><circle cx="-14" cy="-3" r="3" fill="#4FA3E0"/><circle cx="14" cy="-3" r="3" fill="#4FA3E0"/></g>`;
+  default: return '';
+  }
+}
+function faceItemSVG(id){
+  if(id==='face_sun') return `<g><path d="M-30 -10 L-45 -15 M30 -10 L45 -15" stroke="#1E2833" stroke-width="3"/><rect x="-31" y="-15" width="26" height="17" rx="7" fill="#1E2833"/><rect x="5" y="-15" width="26" height="17" rx="7" fill="#1E2833"/><path d="M-6 -9 h12" stroke="#1E2833" stroke-width="3"/><rect x="-26" y="-12" width="9" height="3" rx="1.5" fill="#fff" opacity=".45"/><rect x="10" y="-12" width="9" height="3" rx="1.5" fill="#fff" opacity=".45"/></g>`;
+  if(id==='face_round') return `<g fill="#fff" fill-opacity=".2" stroke="#6B4A2B" stroke-width="3"><circle cx="-17" cy="-6" r="12"/><circle cx="17" cy="-6" r="12"/></g><path d="M-5 -8 q5 -4 10 0" stroke="#6B4A2B" stroke-width="3" fill="none"/>`;
+  return '';
+}
+function neckItemSVG(id,y){
+  switch(id){
+  case 'neck_bandana': return `<g transform="translate(0 ${y})"><path d="M-30 -4 Q0 6 30 -4 L0 26Z" fill="#D64545"/><g fill="#fff"><circle cx="-12" cy="4" r="2"/><circle cx="6" cy="8" r="2"/><circle cx="0" cy="17" r="2"/><circle cx="16" cy="1" r="2"/></g></g>`;
+  case 'neck_bow': return `<g transform="translate(0 ${y+2})"><path d="M0 0 L-20 -11 L-20 11Z" fill="#E0457B"/><path d="M0 0 L20 -11 L20 11Z" fill="#E0457B"/><rect x="-5" y="-6" width="10" height="12" rx="3" fill="#B8325F"/></g>`;
+  case 'neck_scarf': return `<g transform="translate(0 ${y})"><rect x="12" y="0" width="16" height="40" rx="5" fill="#C94A3A"/><rect x="-34" y="-8" width="68" height="16" rx="8" fill="#C94A3A"/><g stroke="#F3D9A4" stroke-width="2" opacity=".8"><path d="M-34 0 H34 M-18 -8 V8 M0 -8 V8 M18 -8 V8 M20 8 V40 M12 24 H28"/></g></g>`;
+  default: return '';
+  }
+}
+
+function dogSVG(si,eq,p){
+  const st=STAGES[si],s=st.s,hs=st.hs,headY=-132,neckY=headY+40*hs;
+  eq=eq||{};
+  let o=`<defs><clipPath id="${p}bc"><ellipse cx="0" cy="-58" rx="48" ry="56"/></clipPath></defs>`;
+  o+=`<ellipse cx="150" cy="274" rx="${62*s}" ry="${9*s}" fill="#000" opacity=".13"/>`;
+  o+=`<g transform="translate(150 272) scale(${s})"><g id="${p}dog" class="dog${st.sleep?' sleeping':''}">`;
+  o+=`<g class="tail"><path d="M36 -34 C66 -40 78 -78 60 -98" stroke="${FD}" stroke-width="15" stroke-linecap="round" fill="none"/></g>`;
+  if(eq.clothes==='cl_cape') o+=`<path d="M-34 -104 Q-82 -30 -68 0 L68 0 Q82 -30 34 -104Z" fill="#C8322E"/><path d="M-60 -6 L60 -6" stroke="#9E2522" stroke-width="4"/>`;
+  o+=`<ellipse cx="-42" cy="-8" rx="17" ry="11" fill="${F}"/><ellipse cx="42" cy="-8" rx="17" ry="11" fill="${F}"/>`;
+  o+=`<ellipse cx="0" cy="-58" rx="48" ry="56" fill="${F}"/><ellipse cx="0" cy="-44" rx="27" ry="38" fill="${CR}"/>`;
+  if(eq.clothes) o+=`<g clip-path="url(#${p}bc)">${clothesSVG(eq.clothes)}</g>`;
+  o+=`<rect x="-30" y="-44" width="20" height="44" rx="10" fill="${F}"/><rect x="10" y="-44" width="20" height="44" rx="10" fill="${F}"/>`;
+  o+=`<ellipse cx="-20" cy="-4" rx="12" ry="7" fill="${CR}"/><ellipse cx="20" cy="-4" rx="12" ry="7" fill="${CR}"/>`;
+  // head
+  o+=`<g transform="translate(0 ${headY}) scale(${hs})">`;
+  o+=`<circle r="46" fill="${F}"/>`;
+  o+=`<ellipse cx="-42" cy="-2" rx="14" ry="27" transform="rotate(18 -42 -2)" fill="${FD}"/><ellipse cx="42" cy="-2" rx="14" ry="27" transform="rotate(-18 42 -2)" fill="${FD}"/>`;
+  o+=`<ellipse cx="0" cy="17" rx="25" ry="18" fill="${CR}"/>`;
+  o+=`<circle cx="-30" cy="12" r="6.5" fill="#F28B8B" opacity=".45"/><circle cx="30" cy="12" r="6.5" fill="#F28B8B" opacity=".45"/>`;
+  if(st.sleep){
+    o+=`<path d="M-24 -5 q7 6 14 0 M10 -5 q7 6 14 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+    o+=`<ellipse cx="0" cy="8" rx="8" ry="6" fill="${INK}"/><path d="M-6 21 q6 4 12 0" stroke="${INK}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  }else{
+    o+=`<g class="eyes"><circle cx="-17" cy="-6" r="6.2" fill="${INK}"/><circle cx="17" cy="-6" r="6.2" fill="${INK}"/><circle cx="-15" cy="-8.5" r="2.1" fill="#fff"/><circle cx="19" cy="-8.5" r="2.1" fill="#fff"/></g>`;
+    o+=`<ellipse cx="0" cy="8" rx="8" ry="6" fill="${INK}"/><path d="M-5 20 q5 11 10 0z" fill="#F07C84"/><path d="M0 13 v5 M0 18 q-6 6 -12 1 M0 18 q6 6 12 1" stroke="${INK}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  }
+  o+=faceItemSVG(eq.face)+headItemSVG(eq.head);
+  o+=`</g>`;
+  o+=neckItemSVG(eq.neck,neckY);
+  if(eq.clothes==='cl_cape') o+=`<circle cx="0" cy="${neckY+2}" r="6" fill="#F2C230" stroke="#C99A12" stroke-width="2"/>`;
+  if(st.sleep) o+=`<g class="zz" fill="#5B6B8C" font-family="M PLUS Rounded 1c, sans-serif" font-weight="800"><text x="46" y="${headY-44*hs}" font-size="18">z</text><text x="60" y="${headY-62*hs}" font-size="24">Z</text></g>`;
+  if(st.glow){const sp=(x,y,r)=>`<path class="twinkle" d="M${x} ${y-r} Q${x} ${y} ${x+r} ${y} Q${x} ${y} ${x} ${y+r} Q${x} ${y} ${x-r} ${y} Q${x} ${y} ${x} ${y-r}Z" fill="#F9D65C"/>`;o+=sp(-70,-150,10)+sp(72,-120,8)+sp(-66,-60,7)+sp(80,-190,6);}
+  o+=`</g></g>`;
+  return o;
+}
+function sceneSVG(p,eq,si){eq=eq||S.equipped;return `<svg viewBox="0 0 300 300" role="img" aria-label="${esc(S.dogName)}">${bgSVG(eq.bg||'bg_room',p)}${dogSVG(si==null?stageIdx():si,eq,p)}</svg>`}
+function thumbSVG(item,p){
+  if(item.slot==='bg') return `<svg viewBox="0 0 300 300" aria-hidden="true">${bgSVG(item.id,p)}</svg>`;
+  const eq={[item.slot]:item.id};
+  const vb=item.slot==='clothes'?'40 60 220 220':'72 50 156 156';
+  return `<svg viewBox="${vb}" aria-hidden="true">${dogSVG(5,eq,p)}</svg>`;
+}
+
+/* ---------- views ---------- */
+const TABS=[
+  {id:'home',label:'ホーム',icon:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>'},
+  {id:'dress',label:'きせかえ',icon:'<path d="M8 3l4 3 4-3 5 4-3 4-2-1v11H8V10l-2 1-3-4z"/>'},
+  {id:'rewards',label:'ごほうび',icon:'<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M3 13h18M12 9v12M12 9C9 9 7 4 10 4c2 0 2 5 2 5s0-5 2-5c3 0 1 5-2 5"/>'},
+  {id:'body',label:'からだ',icon:'<path d="M3 12h4l2-5 4 10 2-5h6"/>'},
+  {id:'settings',label:'設定',icon:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>'},
+];
+function renderNav(){
+  const seen=S.seenCount||0;
+  $('nav').innerHTML=TABS.map(t=>`<button data-tab="${t.id}" ${S.tab===t.id?'aria-current="page"':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${t.icon}</svg>${t.label}${t.id==='dress'&&S.unlocked.length>seen?'<span class="dot"></span>':''}</button>`).join('');
+}
+function renderBanner(){
+  $('banner').innerHTML=S.sample?`<div class="banner"><span><b>サンプル表示中</b>　禁煙開始日やタバコの値段を入れると、あなたの記録になります。</span><button class="btn small primary" data-tab="settings">はじめる</button></div>`:'';
+}
+function nextReward(){return REWARDS.find(i=>!isUnlocked(i.id))}
+function prevDays(item){const i=REWARDS.indexOf(item);return i>0?REWARDS[i-1].days:0}
+
+function viewHome(){
+  const si=stageIdx(),st=STAGES[si],nx=STAGES[si+1];
+  const grow=nx?Math.min(100,(totalDays()-st.d)/(nx.d-st.d)*100):100;
+  const nr=nextReward();
+  const nextH=HEALTH.find(h=>streakMs()<h.ms);
+  const goalPct=S.goalPrice>0?Math.min(100,saved()/S.goalPrice*100):0;
+  return `
+  <section class="scene-card">
+    <div class="scene tappable" id="homeScene" data-pet="h" title="タップしてなでる">${sceneSVG('h')}</div>
+    <div class="scene-meta">
+      <div class="scene-row"><div><span class="pill">${st.name}</span><h2>${esc(S.dogName)}</h2></div><span class="love" id="loveCount">♥ ${S.pets}</span></div>
+      <div class="hint">${st.msg}</div>
+      ${nx?`<div class="bar"><i style="width:${grow}%"></i></div><div class="hint">次の成長「${nx.name}」まで あと ${fmtDur(nx.d*DAY-totalMs())}</div>`:`<div class="hint">最終段階に到達。ずっと一緒です。</div>`}
+    </div>
+  </section>
+  <section class="card timer-card">
+    <div class="eyebrow">禁煙してから</div>
+    <div class="timer"><span class="d" id="tD">0</span><span class="u">日</span><span class="hms" id="tH">00:00:00</span></div>
+    <div class="hint">${fmtDate(S.quitAt)} から${S.pastMs>0?`　・累計 ${Math.floor(totalDays())}日`:''}</div>
+  </section>
+  <section class="stats">
+    <div class="stat"><span class="k">節約できたお金</span><span class="v" id="sSaved">¥0</span><span class="s">1日 ${yen(S.perDay*perCig())}</span></div>
+    <div class="stat"><span class="k">吸わなかったタバコ</span><span class="v"><span id="sCigs">0</span><small>本</small></span><span class="s">1日 ${S.perDay}本ぶん</span></div>
+    <div class="stat"><span class="k">取り戻した時間</span><span class="v" id="sLife">0分</span><span class="s">1本あたり約${MIN_PER_CIG}分</span></div>
+    <div class="stat"><span class="k">誘惑に勝った</span><span class="v">${S.wins}<small>回</small></span><span class="s">「吸いたい！」から</span></div>
+  </section>
+  ${nr?`<section class="card"><div class="eyebrow">次のごほうび</div><div class="row"><div class="thumb locked">${thumbSVG(nr,'nr')}</div><div class="grow"><b>${nr.name}</b> <span class="tag">${SLOTS[nr.slot]}</span><div class="bar" style="margin-top:6px"><i style="width:${Math.min(100,(totalDays()-prevDays(nr))/(nr.days-prevDays(nr))*100)}%"></i></div><div class="hint">${nr.days}日目に届きます。あと ${fmtDur(nr.days*DAY-totalMs())}</div></div></div></section>`:''}
+  ${S.goalName?`<section class="card"><div class="eyebrow">浮いたお金でかなえること</div><div class="scene-row"><b>${esc(S.goalName)}</b><span class="num" id="gTxt">${yen(saved())} / ${yen(S.goalPrice)}</span></div><div class="bar teal"><i id="gBar" style="width:${goalPct}%"></i></div><div class="hint" id="gLeft">${goalPct>=100?'達成！ 自分へのごほうびをどうぞ。':'あと '+yen(S.goalPrice-saved())}</div></section>`:''}
+  ${nextH?`<section class="card"><div class="eyebrow">からだの回復　次は ${nextH.t}</div><b>${nextH.title}</b><div class="bar teal"><i style="width:${Math.min(100,streakMs()/nextH.ms*100)}%"></i></div><div class="hint">あと ${fmtDur(nextH.ms-streakMs())}</div></section>`:''}
+  `;
+}
+function tickHome(){
+  const ms=streakMs();if(!$('tD'))return;
+  $('tD').textContent=Math.floor(ms/DAY);
+  $('tH').textContent=`${pad(Math.floor(ms%DAY/HOUR))}:${pad(Math.floor(ms%HOUR/MIN))}:${pad(Math.floor(ms%MIN/1000))}`;
+  $('sSaved').textContent=yen(saved());
+  $('sCigs').textContent=cigsAvoided().toLocaleString('ja-JP');
+  $('sLife').textContent=fmtDur(cigsAvoided()*MIN_PER_CIG*MIN);
+  if($('gTxt')){const pct=S.goalPrice>0?Math.min(100,saved()/S.goalPrice*100):0;$('gTxt').textContent=`${yen(saved())} / ${yen(S.goalPrice)}`;$('gBar').style.width=pct+'%';$('gLeft').textContent=pct>=100?'達成！ 自分へのごほうびをどうぞ。':'あと '+yen(S.goalPrice-saved());}
+}
+
+function viewDress(){
+  S.seenCount=S.unlocked.length;save();
+  return `<section class="scene-card"><div class="scene tappable" data-pet="w">${sceneSVG('w')}</div><div class="scene-meta"><div class="scene-row"><h2>${esc(S.dogName)}のきせかえ</h2><span class="pill">${S.unlocked.length+1}/${ITEMS.length}</span></div><div class="hint">ごほうびで手に入れたアイテムをタップして着せ替えます。</div></div></section>
+  ${Object.keys(SLOTS).map(slot=>{
+    const items=ITEMS.filter(i=>i.slot===slot);
+    return `<section class="card slot"><h3>${SLOTS[slot]}</h3><div class="chips">
+      ${slot!=='bg'?`<button class="chip" data-equip="${slot}:" aria-pressed="${!S.equipped[slot]}"><span class="thumb none">×</span>なし</button>`:''}
+      ${items.map(i=>{const u=isUnlocked(i.id);return `<button class="chip" data-equip="${slot}:${i.id}" aria-pressed="${S.equipped[slot]===i.id}" ${u?'':'disabled'}><span class="thumb ${u?'':'locked'}">${thumbSVG(i,'c'+i.id)}</span>${u?i.name:i.days+'日目'}</button>`}).join('')}
+    </div></section>`}).join('')}`;
+}
+
+function viewRewards(){
+  const si=stageIdx();
+  const got=REWARDS.filter(i=>isUnlocked(i.id)).length;
+  return `<section class="card"><div class="eyebrow">成長の記録</div><div class="stages">
+    ${STAGES.map((st,i)=>`<div class="stage ${i>si?'future':''} ${i===si?'now':''}"><div class="thumb">${`<svg viewBox="30 40 240 240" aria-hidden="true">${dogSVG(i,{},'st'+i)}</svg>`}</div><b>${i>si?'？？？':st.name}</b><span class="left">${st.d===0?'0日':st.d+'日'}</span></div>`).join('')}
+  </div></section>
+  <section class="card"><div class="scene-row"><div class="eyebrow">マイルストーン報酬</div><span class="pill">${got}/${REWARDS.length}</span></div>
+  <ul class="list">${REWARDS.map(i=>{const u=isUnlocked(i.id),pv=prevDays(i),pct=Math.max(0,Math.min(100,(totalDays()-pv)/(i.days-pv)*100));
+    return `<li class="row"><div class="thumb ${u?'':'locked'}">${thumbSVG(i,'r'+i.id)}</div><div class="grow"><span class="tag">${i.days}日目・${SLOTS[i.slot]}</span><div><b>${u||pct>0?i.name:'？？？'}</b></div>${u?'<span class="got">獲得ずみ</span>':`<div class="bar" style="margin:4px 0"><i style="width:${pct}%"></i></div><span class="left">あと ${fmtDur(i.days*DAY-totalMs())}</span>`}</div>${u?`<button class="btn small" data-wear="${i.id}">着せる</button>`:''}</li>`}).join('')}</ul></section>`;
+}
+
+function viewBody(){
+  const ms=streakMs();let curMarked=false;
+  return `<section class="card"><div class="eyebrow">からだの回復タイムライン</div><div class="hint">今回の禁煙を始めてから ${fmtDur(ms)}。WHO・米国CDCなどが公開している一般的な目安です。</div>
+  <ul class="list">${HEALTH.map(h=>{const done=ms>=h.ms;let cls=done?'done':'';if(!done&&!curMarked){cls='cur';curMarked=true}
+    return `<li class="hl ${cls}"><span class="mark">${done?'✓':''}</span><div class="grow" style="flex:1;min-width:0"><div class="t">${h.t}</div><b>${h.title}</b>${cls==='cur'?`<div class="bar teal" style="margin-top:6px"><i style="width:${Math.min(100,ms/h.ms*100)}%"></i></div><span class="left">あと ${fmtDur(h.ms-ms)}</span>`:''}</div></li>`}).join('')}</ul></section>
+  <section class="card"><div class="eyebrow">あなたの記録</div>
+  <div class="stats">
+    <div class="stat" style="background:var(--soft)"><span class="k">累計の禁煙</span><span class="v">${Math.floor(totalDays())}<small>日</small></span></div>
+    <div class="stat" style="background:var(--soft)"><span class="k">誘惑に勝った</span><span class="v">${S.wins}<small>回</small></span></div>
+    <div class="stat" style="background:var(--soft)"><span class="k">なでた回数</span><span class="v">${S.pets}<small>回</small></span></div>
+    <div class="stat" style="background:var(--soft)"><span class="k">吸ってしまった</span><span class="v">${S.slips.length}<small>回</small></span></div>
+  </div>
+  ${S.slips.length?`<ul class="list">${S.slips.slice().reverse().slice(0,8).map(t=>`<li class="left">${fmtDate(t.at)}　${t.reset?'再スタート':'記録のみ'}</li>`).join('')}</ul>`:''}
+  </section>`;
+}
+
+function viewSettings(){
+  return `<form class="card" id="setForm" novalidate>
+    <div class="eyebrow">あなたの禁煙</div>
+    <div class="field"><label for="fName">わんこの名前</label><input id="fName" maxlength="12" value="${esc(S.dogName)}"></div>
+    <div class="field"><label for="fQuit">禁煙を始めた日時</label><input id="fQuit" type="datetime-local" value="${toLocalInput(S.quitAt)}"></div>
+    <div class="grid2">
+      <div class="field"><label for="fPer">1日に吸っていた本数</label><input id="fPer" type="number" inputmode="numeric" min="1" max="100" value="${S.perDay}"></div>
+      <div class="field"><label for="fPrice">1箱の値段（円）</label><input id="fPrice" type="number" inputmode="numeric" min="1" value="${S.packPrice}"></div>
+      <div class="field"><label for="fPack">1箱の本数</label><input id="fPack" type="number" inputmode="numeric" min="1" value="${S.perPack}"></div>
+    </div>
+    <div class="eyebrow" style="margin-top:6px">浮いたお金の目標</div>
+    <div class="grid2">
+      <div class="field"><label for="fGoal">かなえたいこと</label><input id="fGoal" maxlength="30" value="${esc(S.goalName)}"></div>
+      <div class="field"><label for="fGoalP">必要な金額（円）</label><input id="fGoalP" type="number" inputmode="numeric" min="0" value="${S.goalPrice}"></div>
+    </div>
+    <div class="field"><label for="fReasons">禁煙する理由（1行に1つ。吸いたくなったときに表示します）</label><textarea id="fReasons">${esc(S.reasons.join('\n'))}</textarea></div>
+    <div id="formErr" class="hint" style="color:var(--sos)"></div>
+    <button class="btn primary block" type="submit">${S.sample?'この内容で禁煙をはじめる':'保存する'}</button>
+  </form>
+  ${S.sample?'':`<section class="card"><div class="eyebrow">吸ってしまったとき</div><div class="hint">1本吸っても、そこで終わりではありません。記録して、また続けましょう。</div><button class="btn danger block" data-act="slip">吸ってしまった</button></section>`}
+  <section class="card"><div class="eyebrow">データ</div><div class="hint">記録はこの端末のブラウザにだけ保存されます。ブラウザのデータを消すと記録も消えます。</div>
+    <div id="resetBox"><button class="btn block" data-act="resetAsk">すべての記録を消す</button></div></section>`;
+}
+
+const VIEWS={home:viewHome,dress:viewDress,rewards:viewRewards,body:viewBody,settings:viewSettings};
+function render(){
+  if(!VIEWS[S.tab])S.tab='home';
+  $('view').innerHTML=VIEWS[S.tab]();
+  renderNav();renderBanner();
+  const d=new Date();$('today').textContent=`${d.getMonth()+1}月${d.getDate()}日`;
+  tickHome();
+}
+
+/* ---------- pet ---------- */
+function pet(scene,e,prefix){
+  const r=scene.getBoundingClientRect();
+  const h=document.createElement('span');h.className='heart';h.textContent='♥';
+  h.style.left=((e.clientX||r.left+r.width/2)-r.left)+'px';h.style.top=((e.clientY||r.top+r.height/2)-r.top)+'px';
+  scene.appendChild(h);setTimeout(()=>h.remove(),1000);
+  const dog=document.getElementById(prefix+'dog');
+  if(dog){dog.classList.remove('hop');void dog.getBoundingClientRect();dog.classList.add('hop');}
+  S.pets++;save();
+  const lc=$('loveCount');if(lc)lc.textContent='♥ '+S.pets;
+  const pc=$('petCount');if(pc)pc.textContent=S.pets;
+}
+
+/* ---------- toast / modal / confetti ---------- */
+let toastT;
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;t.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.hidden=true,300)},2600)}
+function openModal(html){const o=$('overlay');o.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${html}</div>`;o.hidden=false}
+function closeModal(){$('overlay').hidden=true;$('overlay').innerHTML=''}
+function confetti(){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=$('confetti');c.hidden=false;const W=c.width=innerWidth,H=c.height=innerHeight,x=c.getContext('2d');
+  const cols=['#E07F22','#2A8A79','#F2C230','#E0457B','#7CC4F2'];
+  const ps=Array.from({length:120},()=>({x:W/2,y:H*.4,vx:(Math.random()-.5)*12,vy:-Math.random()*12-4,r:Math.random()*6+3,c:cols[Math.random()*5|0],a:Math.random()*6}));
+  const t0=performance.now();
+  (function f(t){x.clearRect(0,0,W,H);ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore()});
+    if(t-t0<2600)requestAnimationFrame(f);else{x.clearRect(0,0,W,H);c.hidden=true}})(t0);
+}
+
+/* ---------- unlocks ---------- */
+let lastStage=stageIdx(),lastDay=Math.floor(totalDays());
+function checkUnlocks(){
+  if(S.sample)return;
+  const fresh=REWARDS.filter(i=>totalMs()>=i.days*DAY&&!S.unlocked.includes(i.id));
+  const si=stageIdx(),grew=si>lastStage;lastStage=si;
+  if(!fresh.length&&!grew)return;
+  S.unlocked.push(...fresh.map(i=>i.id));save();
+  if(!$('overlay').hidden||!$('sos').hidden){if(S.tab!=='settings')render();return}
+  const st=STAGES[si];
+  openModal(`<div class="scene" style="border-radius:18px;overflow:hidden">${sceneSVG('m',fresh.length?Object.assign({},S.equipped,{[fresh[fresh.length-1].slot]:fresh[fresh.length-1].id}):S.equipped)}</div>
+    <h2>${grew?`${esc(S.dogName)}が「${st.name}」に成長しました！`:'ごほうびが届きました！'}</h2>
+    ${fresh.length>1?`<p class="hint">${fresh.length}個のごほうびを受け取りました。</p>`:''}
+    <div class="btns">${fresh.length?`<button class="btn primary" data-wear="${fresh[fresh.length-1].id}">着せてみる</button>`:''}<button class="btn" data-act="close">とじる</button></div>
+    ${fresh.length?`<ul class="list">${fresh.map(i=>`<li class="row"><div class="thumb">${thumbSVG(i,'mf'+i.id)}</div><div class="grow"><span class="tag">${i.days}日目・${SLOTS[i.slot]}</span><div><b>${i.name}</b></div></div></li>`).join('')}</ul>`:`<p class="hint">${st.msg}</p>`}`);
+  confetti();if(S.tab!=='settings')render();
+}
+
+/* ---------- SOS ---------- */
+let sosTimers=[],sosGen=0,urgeEnd=0,urgeTimer=null;
+function clearPane(){sosTimers.forEach(t=>{clearTimeout(t);clearInterval(t)});sosTimers=[];sosGen++}
+const PANES=[['breath','深呼吸'],['ball','ボール遊び'],['pet','なでなで'],['idea','やること'],['why','理由']];
+function openSOS(){
+  urgeEnd=Date.now()+180000;
+  $('sos').innerHTML=`<div class="sos-in">
+    <div class="sos-head"><h2>吸いたくなったね。大丈夫。</h2><button class="btn small" data-act="sosClose">閉じる</button></div>
+    <div class="card urge"><div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--soft)" stroke-width="10"/><circle id="urgeArc" cx="50" cy="50" r="44" fill="none" stroke="var(--sos)" stroke-width="10" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0"/></svg><span id="urgeTxt">3:00</span></div>
+      <div class="grow" style="min-width:0"><b id="urgeHead">波が引くまで、あと少し</b><div class="hint">吸いたい気持ちのピークは、たいてい3〜5分で過ぎていきます。下のどれかをしながら待ちましょう。</div></div></div>
+    <div class="seg" role="group" aria-label="気を紛らわせる方法">${PANES.map(([id,l],i)=>`<button data-pane="${id}" aria-pressed="${i===0}">${l}</button>`).join('')}</div>
+    <div class="card pane" id="pane"></div>
+    <div class="card"><div class="hint">いま1本吸うと <b class="num">${yen(perCig())}</b> と、寿命 約<b>${MIN_PER_CIG}分</b>。そして ${esc(S.dogName)} との ${Math.floor(totalDays())}日間。</div></div>
+    <div class="btns"><button class="btn teal" data-act="win">乗り越えた！</button><button class="btn danger" data-act="slip">吸ってしまった</button></div>
+  </div>`;
+  $('sos').hidden=false;document.body.style.overflow='hidden';
+  showPane('breath');
+  clearInterval(urgeTimer);urgeTimer=setInterval(tickUrge,250);tickUrge();
+}
+function tickUrge(){
+  const left=Math.max(0,urgeEnd-Date.now());const a=$('urgeArc');if(!a)return;
+  a.setAttribute('stroke-dashoffset',(276.5*(1-left/180000)).toFixed(1));
+  const sec=Math.ceil(left/1000);$('urgeTxt').textContent=`${Math.floor(sec/60)}:${pad(sec%60)}`;
+  if(left<=0){$('urgeTxt').textContent='✓';$('urgeHead').textContent='3分たちました。波は越えられそうですか？';a.setAttribute('stroke','var(--teal)');clearInterval(urgeTimer)}
+}
+function closeSOS(){clearPane();clearInterval(urgeTimer);$('sos').hidden=true;$('sos').innerHTML='';document.body.style.overflow=''}
+function showPane(id){
+  clearPane();
+  document.querySelectorAll('[data-pane]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pane===id));
+  const P=$('pane');
+  if(id==='breath'){
+    P.innerHTML=`<div class="breath"><div class="bwrap"><div class="bcircle" id="bc"></div><b id="bNum"></b></div><div class="btext" id="bTxt">準備して…</div><div class="hint" id="bCyc">4秒吸って、4秒止めて、6秒かけて吐きます</div></div>`;
+    const ph=[['鼻からゆっくり吸って',4,1],['そのまま止めて',4,1],['口から細く吐いて',6,.5]];const g=sosGen;let k=0,cyc=0;
+    const step=()=>{if(g!==sosGen)return;const [t,d,sc]=ph[k];const bc=$('bc');bc.style.transitionDuration=d+'s';bc.style.transform=`scale(${sc})`;$('bTxt').textContent=t;
+      let n=d;$('bNum').textContent=n;const iv=setInterval(()=>{n--;if(n>0&&$('bNum'))$('bNum').textContent=n},1000);sosTimers.push(iv);
+      sosTimers.push(setTimeout(()=>{clearInterval(iv);k=(k+1)%3;if(k===0){cyc++;$('bCyc').textContent=cyc+'セット完了'}step()},d*1000))};
+    sosTimers.push(setTimeout(step,600));
+  }else if(id==='ball'){
+    P.innerHTML=`<div class="hud"><span>キャッチ <span id="gS">0</span></span><span>のこり <span id="gT">30</span>秒</span></div><div class="field-game" id="fg"><div class="game-center"><b>${esc(S.dogName)}とボール遊び</b><span class="hint">出てくるボールを、消える前にタップ！</span><button class="btn primary" data-act="gameStart">スタート</button></div></div>`;
+  }else if(id==='pet'){
+    P.innerHTML=`<div class="scene tappable" data-pet="s" style="border-radius:16px;overflow:hidden">${sceneSVG('s')}</div><div class="scene-row"><span class="hint">タップしてなでてあげよう</span><span class="love">♥ <span id="petCount">${S.pets}</span></span></div>`;
+  }else if(id==='idea'){
+    P.innerHTML=`<div class="eyebrow">いまできること</div><div class="idea" id="ideaTxt">${IDEAS[Math.random()*IDEAS.length|0]}</div><div class="btns"><button class="btn" data-act="idea">ほかの案</button><button class="btn primary" data-act="ideaDo">やってみる</button></div>`;
+  }else if(id==='why'){
+    const goal=S.goalName?`<div class="card" style="background:var(--soft)"><div class="eyebrow">浮いたお金で</div><b>${esc(S.goalName)}</b><div class="hint">いま ${yen(saved())} / ${yen(S.goalPrice)}</div></div>`:'';
+    P.innerHTML=`<div class="eyebrow">あなたが禁煙を決めた理由</div>${S.reasons.length?`<ol class="reasons">${S.reasons.map(r=>`<li>${esc(r)}</li>`).join('')}</ol>`:'<div class="hint">設定から理由を書いておくと、ここに表示されます。</div>'}${goal}`;
+  }
+}
+function startGame(){
+  clearPane();const g=sosGen,fg=$('fg');let score=0,left=30;fg.innerHTML='';
+  $('gS').textContent=0;$('gT').textContent=30;
+  const spawn=()=>{if(g!==sosGen)return;const b=document.createElement('button');b.className='ball';b.setAttribute('aria-label','ボール');
+    b.style.left=(Math.random()*80+2)+'%';b.style.top=(Math.random()*76+2)+'%';
+    b.addEventListener('pointerdown',ev=>{ev.preventDefault();if(b.classList.contains('caught'))return;b.classList.add('caught');score++;$('gS').textContent=score;setTimeout(()=>b.remove(),250)});
+    fg.appendChild(b);sosTimers.push(setTimeout(()=>{if(!b.classList.contains('caught'))b.remove()},Math.max(700,1300-(30-left)*15)))};
+  sosTimers.push(setInterval(spawn,600));
+  sosTimers.push(setInterval(()=>{left--;if($('gT'))$('gT').textContent=left;if(left<=0){clearPane();fg.innerHTML=`<div class="game-center"><b style="font-size:22px">${score}個キャッチ！</b><span class="hint">${esc(S.dogName)}は大満足。30秒、吸わずに過ごせました。</span><button class="btn primary" data-act="gameStart">もう一回</button></div>`}},1000));
+  spawn();
+}
+
+/* ---------- slip ---------- */
+function openSlip(){
+  openModal(`<h2>記録して、また続けよう</h2>
+  <p class="hint">1本吸っても、それまでの日々が無駄になるわけではありません。「失敗した」と考えるほど、次の1本につながりやすくなります。どうするか選んでください。</p>
+  <p class="note">どちらを選んでも、${esc(S.dogName)}の成長と手に入れたごほうびはそのまま残ります。</p>
+  <div class="btns" style="flex-direction:column"><button class="btn teal" data-act="slipLog">記録だけして、カウントは続ける</button><button class="btn danger" data-act="slipReset">いまから再スタートする</button><button class="btn" data-act="close">キャンセル</button></div>`);
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab],[data-act],[data-equip],[data-wear],[data-pane]');if(!t)return;
+  if(t.dataset.tab){S.tab=t.dataset.tab;save();render();scrollTo(0,0);return}
+  if(t.dataset.pane){showPane(t.dataset.pane);return}
+  if(t.dataset.equip){const [slot,id]=t.dataset.equip.split(':');S.equipped[slot]=id||null;save();render();return}
+  if(t.dataset.wear){const i=ITEM[t.dataset.wear];S.equipped[i.slot]=i.id;save();closeModal();S.tab='dress';render();scrollTo(0,0);toast(i.name+'を着せました');return}
+  switch(t.dataset.act){
+    case 'sos':openSOS();break;
+    case 'sosClose':closeSOS();break;
+    case 'close':closeModal();break;
+    case 'win':S.wins++;save();closeSOS();render();confetti();toast(`やったね！ ${S.dogName}がしっぽを振っています`);break;
+    case 'slip':closeSOS();openSlip();break;
+    case 'slipLog':S.slips.push({at:Date.now(),reset:false});save();closeModal();render();toast('記録しました。ここからまた一緒に。');break;
+    case 'slipReset':{const now=Date.now();S.pastMs+=now-S.quitAt;S.quitAt=now;S.slips.push({at:now,reset:true});save();closeModal();render();toast('再スタート。成長とごほうびはそのままです。');break;}
+    case 'gameStart':startGame();break;
+    case 'idea':{let n;do{n=IDEAS[Math.random()*IDEAS.length|0]}while(n===$('ideaTxt').textContent&&IDEAS.length>1);$('ideaTxt').textContent=n;break;}
+    case 'ideaDo':toast('いいね。終わったら「乗り越えた！」を押そう');break;
+    case 'resetAsk':$('resetBox').innerHTML=`<div class="confirm"><b>本当にすべて消しますか？</b><span>禁煙の記録、ごほうび、きせかえが消えて、サンプル表示に戻ります。元に戻せません。</span><div class="btns"><button class="btn danger" data-act="resetDo">消す</button><button class="btn" data-act="resetNo">やめる</button></div></div>`;break;
+    case 'resetNo':render();break;
+    case 'resetDo':try{localStorage.removeItem(KEY)}catch(_){ }S=defaults();S.unlocked=REWARDS.filter(i=>totalMs()>=i.days*DAY).map(i=>i.id);lastStage=stageIdx();render();toast('記録を消しました');break;
+  }
+});
+document.addEventListener('pointerdown',e=>{
+  const sc=e.target.closest('[data-pet]');if(!sc)return;
+  if(e.target.closest('.ball'))return;
+  pet(sc,e,sc.dataset.pet);
+});
+$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('overlay').hidden)closeModal();else if(!$('sos').hidden)closeSOS()}});
+
+document.addEventListener('submit',e=>{
+  if(e.target.id!=='setForm')return;e.preventDefault();
+  const v=id=>$(id).value.trim();
+  const q=new Date(v('fQuit')).getTime(),per=+v('fPer'),price=+v('fPrice'),pack=+v('fPack'),gp=+(v('fGoalP')||0);
+  const err=[];
+  if(!v('fName'))err.push('わんこの名前を入れてください。');
+  if(!isFinite(q))err.push('禁煙を始めた日時を入れてください。');
+  else if(q>Date.now()+60000)err.push('禁煙を始めた日時は、いまより前の日時にしてください。');
+  if(!(per>0))err.push('1日の本数は1以上の数字にしてください。');
+  if(!(price>0)||!(pack>0))err.push('1箱の値段と本数は1以上の数字にしてください。');
+  if(err.length){$('formErr').textContent=err.join(' ');return}
+  const first=S.sample;
+  if(first){S.sample=false;S.unlocked=[];S.seenCount=0;S.pastMs=0;S.wins=0;S.pets=0;S.slips=[];S.equipped={bg:'bg_room',clothes:null,head:null,face:null,neck:null};}
+  else if(q!==S.quitAt){S.pastMs=0}
+  Object.assign(S,{dogName:v('fName'),quitAt:q,perDay:per,packPrice:price,perPack:pack,goalName:v('fGoal'),goalPrice:gp,reasons:$('fReasons').value.split('\n').map(s=>s.trim()).filter(Boolean)});
+  lastStage=first?0:stageIdx();
+  S.tab='home';save();render();scrollTo(0,0);
+  toast(first?`${S.dogName}との禁煙がはじまりました`:'保存しました');
+  checkUnlocks();
+});
+
+/* ---------- loop ---------- */
+render();
+setInterval(()=>{
+  if(S.tab==='home'&&$('overlay').hidden)tickHome();
+  const d=Math.floor(totalDays());
+  if(d!==lastDay){lastDay=d;if(S.tab!=='dress'&&S.tab!=='settings'&&$('overlay').hidden)render()}
+  checkUnlocks();
+},1000);
+})();
+</script>
