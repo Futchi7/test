@@ -24,4 +24,4 @@
 記録はブラウザの `localStorage` にのみ保存されます（サーバー送信なし）。ブラウザのデータを消すと記録も消えます。
 
 ## 開発
-本体は `src/app.html`。編集後に `./build.sh` を実行すると `index.html` を再生成します。
+本体は `src/app.html`、犬の画像は `assets/dog.webp`（背景透過済み）。編集後に `./build.sh` を実行すると `index.html` を再生成します。

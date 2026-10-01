@@ -49,7 +49,8 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.3
 
 .top{display:flex;align-items:center;justify-content:space-between;padding-top:14px}
 .brand{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
-.brand svg{width:26px;height:26px}
+.brand-ico{width:32px;height:32px;border-radius:50%;overflow:hidden;position:relative;flex:none;background:var(--accent-soft)}
+.brand-ico img{position:absolute;width:76px;max-width:none;left:-7px;top:-6px}
 .top .date{font-size:12px;color:var(--muted)}
 
 .banner{background:var(--accent-soft);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:13px}
@@ -224,7 +225,7 @@ ul.list{margin:0;padding:0}
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="17" r="11" fill="#E7AE6A"/><ellipse cx="6.5" cy="15" rx="4" ry="7" transform="rotate(20 6.5 15)" fill="#C98A45"/><ellipse cx="25.5" cy="15" rx="4" ry="7" transform="rotate(-20 25.5 15)" fill="#C98A45"/><ellipse cx="16" cy="21" rx="6" ry="4.5" fill="#FFF3E0"/><circle cx="12" cy="15.5" r="1.6" fill="#3A2A20"/><circle cx="20" cy="15.5" r="1.6" fill="#3A2A20"/><ellipse cx="16" cy="19" rx="2" ry="1.4" fill="#3A2A20"/></svg>
+      <span class="brand-ico"><img src="assets/dog.webp" alt=""></span>
       禁煙わんこ
     </div>
     <div class="date" id="today"></div>
@@ -414,7 +415,6 @@ function bgSVG(id,p){
   }
 }
 
-const F='#E7AE6A',FD='#C98A45',CR='#FFF3E0',INK='#3A2A20';
 function clothesSVG(id){
   switch(id){
   case 'cl_border':{let o='<rect x="-50" y="-116" width="100" height="74" fill="#FBFBF6"/>';for(let y=-108;y<-46;y+=13)o+=`<rect x="-50" y="${y}" width="100" height="6" fill="#2E4E86"/>`;return o+'<rect x="-50" y="-44" width="100" height="4" fill="#2E4E86"/>';}
@@ -422,6 +422,7 @@ function clothesSVG(id){
     return `<rect x="-50" y="-116" width="100" height="82" fill="#3F8C6A"/>${z}<rect x="-50" y="-40" width="100" height="8" fill="#2F7556"/><path d="M-40 -40 v8 M-30 -40 v8 M-20 -40 v8 M-10 -40 v8 M0 -40 v8 M10 -40 v8 M20 -40 v8 M30 -40 v8 M40 -40 v8" stroke="#3F8C6A" stroke-width="2"/>`;}
   case 'cl_rain': return `<rect x="-50" y="-116" width="100" height="100" fill="#F4C22F"/><path d="M0 -116 V-16" stroke="#D9A514" stroke-width="3"/><g fill="#2F4F6F"><circle cx="-7" cy="-92" r="3.5"/><circle cx="-7" cy="-72" r="3.5"/><circle cx="-7" cy="-52" r="3.5"/></g><rect x="14" y="-62" width="22" height="7" rx="3" fill="#D9A514"/>`;
   case 'cl_hoodie': return `<rect x="-50" y="-116" width="100" height="86" fill="#8D7FC2"/><path d="M-24 -60 H24 L30 -38 H-30Z" fill="#7B6DB0"/><path d="M-8 -110 V-84 M8 -110 V-84" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="-8" cy="-83" r="3" fill="#fff"/><circle cx="8" cy="-83" r="3" fill="#fff"/><rect x="-50" y="-34" width="100" height="6" fill="#7466A8"/>`;
+  case 'cl_cape': return `<rect x="-50" y="-116" width="100" height="90" fill="#C8322E"/><path d="M-50 -40 H50" stroke="#F2C230" stroke-width="5"/><path d="M-30 -116 Q-20 -80 -34 -40 M10 -116 Q22 -80 12 -40" stroke="#9E2522" stroke-width="3" fill="none"/>`;
   default: return '';
   }
 }
@@ -449,38 +450,26 @@ function neckItemSVG(id,y){
   }
 }
 
+/* 写真の犬（assets/dog.webp, 694x678）をローカル座標 幅200・足元y=0 に配置。
+   アクセサリーは元のイラスト用の座標系を、写真の頭・首・胴の位置に合わせて変換して重ねる */
+const DOG_IMG='assets/dog.webp',DOG_W=200,DOG_H=195.4;
+const HEAD_T='translate(-18.9 -131.3) rotate(-17) scale(1.02) translate(0 6)';
+const NECK_T='translate(-14 -84) rotate(-8) scale(1.15)';
+const BODY_T='translate(59 -80) rotate(-4) scale(.86 1.04) translate(0 73)';
+const BODY_CLIP='M20 -108 Q46 -126 80 -110 Q101 -94 100 -62 Q98 -42 86 -38 Q58 -33 30 -38 Q14 -62 20 -108Z';
 function dogSVG(si,eq,p){
-  const st=STAGES[si],s=st.s,hs=st.hs,headY=-132,neckY=headY+40*hs;
+  const st=STAGES[si],s=st.s;
   eq=eq||{};
-  let o=`<defs><clipPath id="${p}bc"><ellipse cx="0" cy="-58" rx="48" ry="56"/></clipPath></defs>`;
-  o+=`<ellipse cx="150" cy="274" rx="${62*s}" ry="${9*s}" fill="#000" opacity=".13"/>`;
-  o+=`<g transform="translate(150 272) scale(${s})"><g id="${p}dog" class="dog${st.sleep?' sleeping':''}">`;
-  o+=`<g class="tail"><path d="M36 -34 C66 -40 78 -78 60 -98" stroke="${FD}" stroke-width="15" stroke-linecap="round" fill="none"/></g>`;
-  if(eq.clothes==='cl_cape') o+=`<path d="M-34 -104 Q-82 -30 -68 0 L68 0 Q82 -30 34 -104Z" fill="#C8322E"/><path d="M-60 -6 L60 -6" stroke="#9E2522" stroke-width="4"/>`;
-  o+=`<ellipse cx="-42" cy="-8" rx="17" ry="11" fill="${F}"/><ellipse cx="42" cy="-8" rx="17" ry="11" fill="${F}"/>`;
-  o+=`<ellipse cx="0" cy="-58" rx="48" ry="56" fill="${F}"/><ellipse cx="0" cy="-44" rx="27" ry="38" fill="${CR}"/>`;
-  if(eq.clothes) o+=`<g clip-path="url(#${p}bc)">${clothesSVG(eq.clothes)}</g>`;
-  o+=`<rect x="-30" y="-44" width="20" height="44" rx="10" fill="${F}"/><rect x="10" y="-44" width="20" height="44" rx="10" fill="${F}"/>`;
-  o+=`<ellipse cx="-20" cy="-4" rx="12" ry="7" fill="${CR}"/><ellipse cx="20" cy="-4" rx="12" ry="7" fill="${CR}"/>`;
-  // head
-  o+=`<g transform="translate(0 ${headY}) scale(${hs})">`;
-  o+=`<circle r="46" fill="${F}"/>`;
-  o+=`<ellipse cx="-42" cy="-2" rx="14" ry="27" transform="rotate(18 -42 -2)" fill="${FD}"/><ellipse cx="42" cy="-2" rx="14" ry="27" transform="rotate(-18 42 -2)" fill="${FD}"/>`;
-  o+=`<ellipse cx="0" cy="17" rx="25" ry="18" fill="${CR}"/>`;
-  o+=`<circle cx="-30" cy="12" r="6.5" fill="#F28B8B" opacity=".45"/><circle cx="30" cy="12" r="6.5" fill="#F28B8B" opacity=".45"/>`;
-  if(st.sleep){
-    o+=`<path d="M-24 -5 q7 6 14 0 M10 -5 q7 6 14 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-    o+=`<ellipse cx="0" cy="8" rx="8" ry="6" fill="${INK}"/><path d="M-6 21 q6 4 12 0" stroke="${INK}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
-  }else{
-    o+=`<g class="eyes"><circle cx="-17" cy="-6" r="6.2" fill="${INK}"/><circle cx="17" cy="-6" r="6.2" fill="${INK}"/><circle cx="-15" cy="-8.5" r="2.1" fill="#fff"/><circle cx="19" cy="-8.5" r="2.1" fill="#fff"/></g>`;
-    o+=`<ellipse cx="0" cy="8" rx="8" ry="6" fill="${INK}"/><path d="M-5 20 q5 11 10 0z" fill="#F07C84"/><path d="M0 13 v5 M0 18 q-6 6 -12 1 M0 18 q6 6 12 1" stroke="${INK}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
-  }
-  o+=faceItemSVG(eq.face)+headItemSVG(eq.head);
-  o+=`</g>`;
-  o+=neckItemSVG(eq.neck,neckY);
-  if(eq.clothes==='cl_cape') o+=`<circle cx="0" cy="${neckY+2}" r="6" fill="#F2C230" stroke="#C99A12" stroke-width="2"/>`;
-  if(st.sleep) o+=`<g class="zz" fill="#5B6B8C" font-family="M PLUS Rounded 1c, sans-serif" font-weight="800"><text x="46" y="${headY-44*hs}" font-size="18">z</text><text x="60" y="${headY-62*hs}" font-size="24">Z</text></g>`;
-  if(st.glow){const sp=(x,y,r)=>`<path class="twinkle" d="M${x} ${y-r} Q${x} ${y} ${x+r} ${y} Q${x} ${y} ${x} ${y+r} Q${x} ${y} ${x-r} ${y} Q${x} ${y} ${x} ${y-r}Z" fill="#F9D65C"/>`;o+=sp(-70,-150,10)+sp(72,-120,8)+sp(-66,-60,7)+sp(80,-190,6);}
+  let o=`<defs><clipPath id="${p}bc"><path d="${BODY_CLIP}"/></clipPath><linearGradient id="${p}sh" x1="0" y1="0" x2=".3" y2="1"><stop offset=".35" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs>`;
+  o+=`<ellipse cx="150" cy="274" rx="${100*s}" ry="${9*s}" fill="#000" opacity=".16"/>`;
+  o+=`<g transform="translate(150 274) scale(${s})"><g id="${p}dog" class="dog${st.sleep?' sleeping':''}">`;
+  o+=`<image href="${DOG_IMG}" x="${-DOG_W/2}" y="${-DOG_H}" width="${DOG_W}" height="${DOG_H}"/>`;
+  if(eq.clothes) o+=`<g clip-path="url(#${p}bc)"><g transform="${BODY_T}">${clothesSVG(eq.clothes)}</g><path d="${BODY_CLIP}" fill="url(#${p}sh)"/></g><path d="${BODY_CLIP}" fill="none" stroke="#000" stroke-opacity=".18" stroke-width="1.2"/>`;
+  if(eq.neck) o+=`<g transform="${NECK_T}">${neckItemSVG(eq.neck,0)}</g>`;
+  if(eq.clothes==='cl_cape') o+=`<g transform="${NECK_T}"><circle cx="0" cy="6" r="6" fill="#F2C230" stroke="#C99A12" stroke-width="2"/></g>`;
+  if(eq.face||eq.head) o+=`<g transform="${HEAD_T}">${faceItemSVG(eq.face)}<g transform="translate(0 12)">${headItemSVG(eq.head)}</g></g>`;
+  if(st.sleep) o+=`<g class="zz" fill="#5B6B8C" font-family="M PLUS Rounded 1c, sans-serif" font-weight="800"><text x="-4" y="-196" font-size="22">z</text><text x="14" y="-218" font-size="30">Z</text></g>`;
+  if(st.glow){const sp=(x,y,r)=>`<path class="twinkle" d="M${x} ${y-r} Q${x} ${y} ${x+r} ${y} Q${x} ${y} ${x} ${y+r} Q${x} ${y} ${x-r} ${y} Q${x} ${y} ${x} ${y+r}Z" fill="#F9D65C"/>`;o+=sp(-108,-170,10)+sp(96,-150,8)+sp(-112,-70,7)+sp(30,-200,6);}
   o+=`</g></g>`;
   return o;
 }
@@ -488,7 +477,7 @@ function sceneSVG(p,eq,si){eq=eq||S.equipped;return `<svg viewBox="0 0 300 300" 
 function thumbSVG(item,p){
   if(item.slot==='bg') return `<svg viewBox="0 0 300 300" aria-hidden="true">${bgSVG(item.id,p)}</svg>`;
   const eq={[item.slot]:item.id};
-  const vb=item.slot==='clothes'?'40 60 220 220':'72 50 156 156';
+  const vb=item.slot==='clothes'?'40 70 220 220':'52 72 150 150';
   return `<svg viewBox="${vb}" aria-hidden="true">${dogSVG(5,eq,p)}</svg>`;
 }
 
@@ -566,7 +555,7 @@ function viewRewards(){
   const si=stageIdx();
   const got=REWARDS.filter(i=>isUnlocked(i.id)).length;
   return `<section class="card"><div class="eyebrow">成長の記録</div><div class="stages">
-    ${STAGES.map((st,i)=>`<div class="stage ${i>si?'future':''} ${i===si?'now':''}"><div class="thumb">${`<svg viewBox="30 40 240 240" aria-hidden="true">${dogSVG(i,{},'st'+i)}</svg>`}</div><b>${i>si?'？？？':st.name}</b><span class="left">${st.d===0?'0日':st.d+'日'}</span></div>`).join('')}
+    ${STAGES.map((st,i)=>`<div class="stage ${i>si?'future':''} ${i===si?'now':''}"><div class="thumb">${`<svg viewBox="20 36 260 260" aria-hidden="true">${dogSVG(i,{},'st'+i)}</svg>`}</div><b>${i>si?'？？？':st.name}</b><span class="left">${st.d===0?'0日':st.d+'日'}</span></div>`).join('')}
   </div></section>
   <section class="card"><div class="scene-row"><div class="eyebrow">マイルストーン報酬</div><span class="pill">${got}/${REWARDS.length}</span></div>
   <ul class="list">${REWARDS.map(i=>{const u=isUnlocked(i.id),pv=prevDays(i),pct=Math.max(0,Math.min(100,(totalDays()-pv)/(i.days-pv)*100));
