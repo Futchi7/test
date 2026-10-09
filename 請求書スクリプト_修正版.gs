@@ -74,7 +74,8 @@ function createAndOrganizeReceipts() {
     return isNaN(num) ? 0 : num;
   }
 
-  var rows = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+  // G列「税率」（8 または 10）。空欄は10%として扱う
+  var rows = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
   var customers = {};
 
   for (var i = 0; i < rows.length; i++) {
@@ -89,7 +90,8 @@ function createAndOrganizeReceipts() {
       rowIndex: i + 2,
       item: rows[i][1],
       price: cleanNumber(rows[i][2]),
-      count: cleanNumber(rows[i][3])
+      count: cleanNumber(rows[i][3]),
+      rate: cleanNumber(rows[i][6]) || 10
     });
   }
 
@@ -133,11 +135,21 @@ function createAndOrganizeReceipts() {
       }
 
       var subtotal = 0;
+      var base10 = 0;  // 標準税率（10%）対象の税抜合計
+      var base8 = 0;   // 軽減税率（8%）対象の税抜合計
 
       for (var j = 0; j < items.length; j++) {
         var itemData = items[j];
+        if (itemData.rate !== 10 && itemData.rate !== 8) {
+          throw new Error(itemData.rowIndex + "行目の税率が「" + itemData.rate + "」です。8 か 10 を入れてください。");
+        }
         var amount = itemData.price * itemData.count;
         subtotal += amount;
+        if (itemData.rate === 8) {
+          base8 += amount;
+        } else {
+          base10 += amount;
+        }
 
         sheet.getRange(itemData.rowIndex, 5).setValue(amount);
 
@@ -146,13 +158,17 @@ function createAndOrganizeReceipts() {
         newRow.replaceText("{{単価}}", currencyFormatter.format(itemData.price) + "-");
         newRow.replaceText("{{数量}}", itemData.count + " ヶ");
         newRow.replaceText("{{金額}}", currencyFormatter.format(amount) + "-");
+        newRow.replaceText("{{税率}}", itemData.rate === 8 ? "8%※" : "10%");
 
         targetTable.insertTableRow(templateRowIndex + j + 1, newRow);
       }
 
       targetTable.removeRow(templateRowIndex);
 
-      var tax = Math.round(subtotal * 0.1);
+      // 消費税は税率ごとに1回だけ端数処理する（インボイス制度のルール）
+      var tax10 = Math.round(base10 * 0.1);
+      var tax8 = Math.round(base8 * 0.08);
+      var tax = tax10 + tax8;
       var total = subtotal + tax;
 
       var formattedSubtotal = currencyFormatter.format(subtotal) + "-";
@@ -166,6 +182,10 @@ function createAndOrganizeReceipts() {
       body.replaceText("{{消費税額}}", formattedTax);
       body.replaceText("{{税込}}", formattedTotal);
       body.replaceText("{{税込金額}}", formattedTotal);
+      body.replaceText("{{標準税率対象額}}", currencyFormatter.format(base10) + "-");
+      body.replaceText("{{標準税率消費税}}", currencyFormatter.format(tax10) + "-");
+      body.replaceText("{{軽減税率対象額}}", currencyFormatter.format(base8) + "-");
+      body.replaceText("{{軽減税率消費税}}", currencyFormatter.format(tax8) + "-");
       body.replaceText("{{日付}}", dateString);
 
       // 【修正】置き換えられずに残った差し込み欄があれば、PDFを作らずにエラーにする
